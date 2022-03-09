@@ -1,25 +1,21 @@
 import run from "aocrunner"
 
-const parseInput = rawInput => rawInput.split('\n')
-
-const part1 = (rawInput) => {
-  const input = parseInput(rawInput)
-  const count = Array(input[0].length).fill(0).map(_ => ({}))
-  input.forEach(message => {
+const count = (rawInput, compare) => {
+  const messages = rawInput.split('\n')
+  const count = Array(messages[0].length).fill(0).map(_ => ({}))
+  messages.forEach(message => {
     message.split('').forEach((c, i) =>
       count[i][c] = (count[i]?.[c] || 0) + 1
     )
   })
-  const findMax = map => Object.keys(map).sort((a, b) => map[b] - map[a])[0]
+  const first = map => Object.keys(map).sort((a, b) => compare(map[a], map[b]))[0]
 
-  return count.map(findMax).join('')
+  return count.map(first).join('')
 }
 
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
+const part1 = (input) => count(input, (a, b) => b-a)
 
-  return
-}
+const part2 = (input) => count(input, (a, b) => a-b)
 
 run({
   part1: {
