@@ -22,6 +22,16 @@ const part1 = (rawInput) => {
 const part2 = (rawInput) => {
   const input = parseInput(rawInput)
 
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+  const decrypt = ([h, ...t], id) => {
+    if (!h) return ''
+    if (h == '-')
+      return ' ' + decrypt(t, id)
+    return alphabet[(alphabet.indexOf(h) + id) % alphabet.length] + decrypt(t, id)
+  }
+
+  return +input.filter(isValid).find(([name,id]) => decrypt(name, +id).includes('north'))[1]
 }
 
 run({
