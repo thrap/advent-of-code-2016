@@ -1,15 +1,26 @@
 import run from "aocrunner"
 
-const parseInput = rawInput => rawInput.split('\n').map(l => l.trim().split(/ +/).map(x => +x))
+const parse = input => input.split('\n').map(l => l.trim().split(/ +/).map(x => +x))
 
-const part1 = (rawInput) => {
-  const triangles = parseInput(rawInput).map(t => t.sort((a,b) => a-b))
+const isTriangle = arr => {
+  const [a, b, c] = arr.sort((a,b) => a-b)
 
-  return triangles.filter(([a,b,c]) => a + b > c).length
+  return a + b > c
 }
 
-const part2 = (rawInput) => {
+const part1 = (input) => parse(input).filter(isTriangle).length
 
+const part2 = (input) => {
+  const arr = parse(input).flat()
+
+  var count = 0
+  for (var i = 0; i < arr.length; i+=9) {
+    for (var j = 0; j < 3; j++) {
+      count = count + isTriangle([arr[i+j],arr[i+j+3],arr[i+j+6]])
+    }
+  }
+
+  return count
 }
 
 run({
