@@ -17,7 +17,21 @@ const part1 = (rawInput) => {
 }
 
 const part2 = (rawInput) => {
-
+  const secret = parseInput(rawInput)
+  var ans = Array(8)
+  var count = 0
+  for (var i = 0; count < 8; i++) {
+    var hash = MD5(secret + i).toString()
+    if (hash.substring(0, 5) == '00000') {
+      const idx = hash[5]
+      if (!ans[idx] && idx < 8) {
+        ans[idx] = hash[6]
+        count++
+        console.log(i, ans);
+      }
+    }
+  }
+  return ans.join('')
 }
 
 run({
