@@ -12,7 +12,7 @@
 <!--SOLUTIONS-->
 
 [![Day](https://badgen.net/badge/01/%E2%98%85%E2%98%85/green)](src/day01)
-![Day](https://badgen.net/badge/02/%E2%98%86%E2%98%86/gray)
+[![Day](https://badgen.net/badge/02/%E2%98%85%E2%98%86/yellow)](src/day02)
 ![Day](https://badgen.net/badge/03/%E2%98%86%E2%98%86/gray)
 ![Day](https://badgen.net/badge/04/%E2%98%86%E2%98%86/gray)
 ![Day](https://badgen.net/badge/05/%E2%98%86%E2%98%86/gray)
@@ -69,16 +69,16 @@ npm start 1
 
 ```
 Day 01
-Time part 1: 0.528ms
-Time part 2: 0.883ms
-Both parts: 1.411088ms
+Time part 1: 0.656ms
+Time part 2: 0.966ms
+Both parts: 1.621918ms
 ```
 
 ```
 Day 02
-Time part 1: -
+Time part 1: 1.932ms
 Time part 2: -
-Both parts: -
+Both parts: 1.931661ms
 ```
 
 ```
@@ -243,8 +243,8 @@ Both parts: -
 ```
 
 ```
-Total stars: 2/50
-Total time: 1.411ms
+Total stars: 3/50
+Total time: 3.554ms
 ```
 
 <!--/RESULTS-->
