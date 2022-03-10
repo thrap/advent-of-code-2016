@@ -1,22 +1,18 @@
 import run from "aocrunner"
 
-const parseInput = rawInput => rawInput.split('\n')
-
-const part1 = (rawInput) => {
-  var instructions = parseInput(rawInput)
-
+const getChips = instructions => {
   const chips = {}
   const input = /value (\d+) goes to (bot \d+)/
   const give = /(bot \d+) gives low to (.+ \d+) and high to (.+ \d+)/
   const addVal = (name, val) => {
     if (chips[name]) {
-      chips[name].push(val)
+      chips[name] = [Math.min(chips[name], val), Math.max(chips[name], val)]
     } else {
-      chips[name] = [val]
+      chips[name] = val
     }
   }
 
-  for (var i = 0; i < 100 && instructions.length; i++) {
+  while(instructions.length) {
     var queue = []
     instructions.forEach(line => {
       if (input.test(line)) {
@@ -25,8 +21,8 @@ const part1 = (rawInput) => {
       } else if (give.test(line)) {
         const [,bot, low, high] = line.match(give)
         if (chips[bot]?.length == 2) {
-          addVal(low, Math.min(...chips[bot]))
-          addVal(high, Math.max(...chips[bot]))
+          addVal(low,  chips[bot][0])
+          addVal(high, chips[bot][1])
         } else {
           queue.push(line)
         }
@@ -34,13 +30,19 @@ const part1 = (rawInput) => {
     });
     instructions = queue
   }
-  return +Object.keys(chips).find(chip => Math.max(...chips[chip]) == 61 && Math.min(...chips[chip]) == 17).split(' ')[1]
+  return chips
+}
+const part1 = (input) => {
+  const chips = getChips(input.split('\n'))
+
+  const name = Object.keys(chips).find(chip => chips[chip][1] == 61 && chips[chip][0] == 17)
+  return +name.split(' ')[1]
 }
 
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
+const part2 = (input) => {
+  const chips = getChips(input.split('\n'))
 
-  return
+  return chips['output 0'] * chips['output 1'] * chips['output 2']
 }
 
 run({
