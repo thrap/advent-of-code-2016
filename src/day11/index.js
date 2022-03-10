@@ -1,19 +1,7 @@
 import run from "aocrunner"
 
-const re = /(.*)/
 const parseLine = l => l.match(re).slice(1).map(x => +x ? +x : x)
 const parseInput = rawInput => rawInput.split('\n')//.map(parseLine)
-
-const prettyPrint = (elevator, state, printOrder) => {
-  for (var i = 3; i >= 0; i--) {
-    console.log("F"+(i+1), (elevator == i ? 'E ' : '. '), printOrder.map((x, j) => {
-      const [h, t] = x.split(' ')
-      const abbr = h.substring(0, printOrder.length == 4 ? 1 : 2).toUpperCase() + '' +  t[0].toUpperCase()
-      return state[i][j] ? abbr : '. ' + (printOrder.length == 4 ? '' : ' ')
-    }).join(' '))
-  }
-  console.log();
-}
 
 const isValid = state => {
   return state.every(floor => {
@@ -74,19 +62,9 @@ const getPossible = (state, elevator, moves) => {
 }
 
 const manhattan = state => {
-  //return manhattan2(state)
   var sum = 0
   for (var i = 1; i < 4; i++) {
     sum += i * state[3-i].filter(x => x).length
-  }
-  return sum
-}
-
-const manhattan2 = state => {
-  var sum = 0
-  for (var i = 1; i < 4; i++) {
-    const count = Math.ceil(state[3-i].filter(x => x).length / 2)
-    sum += i + i * (count - 1)
   }
   return sum
 }
@@ -102,15 +80,10 @@ const part1 = (rawInput) => {
   const seen = {}
 
   var initialState = Array(4).fill(0).map((_,i) => printOrder.map(x => asd[i].includes(x)))
-  prettyPrint(0, initialState, printOrder)
   var states = [[initialState, elevator, 0, manhattan(initialState)]]
   for (var i = 0; i <= 5000000 && states.length; i++) {
     const [state, elevator, moves, man] = states.shift()
-    if (i % 10000 == 0) {
-      console.log(man, moves);
-      //states = states.slice(states.length - 10000)
-      console.log(i, states.length);
-    }
+
     if (state[3].every(x => x)) {
       console.log("VUNNET");
       return moves
@@ -139,7 +112,6 @@ const part1 = (rawInput) => {
         }
         str += pairs + ' ' + generators + ' ' + chips + "\n"
       }
-      //console.log(str);
 
       if (seen[str])
         return
@@ -168,7 +140,61 @@ const binarySearch = (states, item, low,high) => {
 }
 
 const part2 = (rawInput) => {
+  const input = parseInput(rawInput)
+  const asd = input.map(l => l.split('contains ')[1].replace(/\.|(a )|(-compatible)/g, '').replace(/,? and /g, ', ').split(', ').filter(x => x != 'nothing relevant'))
+  asd[0].push('elerium generator')
+  asd[0].push('elerium microchip')
+  asd[0].push('dilithium generator')
+  asd[0].push('dilithium microchip')
 
+  var elevator = 0
+
+  const printOrder = asd.flat().sort()
+
+  const seen = {}
+
+
+  var initialState = Array(4).fill(0).map((_,i) => printOrder.map(x => asd[i].includes(x)))
+  var states = [[initialState, elevator, 0, manhattan(initialState)]]
+  for (var i = 0; i <= 5000000 && states.length; i++) {
+    const [state, elevator, moves, man] = states.shift()
+    if (state[3].every(x => x)) {
+      console.log("VUNNET");
+      return moves
+    }
+    const pos = getPossible(state, elevator, moves)
+    pos.forEach(([state, elevator, moves]) => {
+      var man = manhattan(state)
+      var str = elevator + state.join('')
+
+      str = elevator + ': '
+      for (var floor = 0; floor < 4; floor++) {
+        var pairs = 0
+        var generators = 0
+        var chips = 0
+        for (var i = 0; i < state[floor].length; i+=2) {
+          const generator = state[floor][i]
+          const chip = state[floor][i+1]
+
+          if (generator && chip) {
+            pairs++
+          } else if (generator) {
+            generators++
+          } else if (chip) {
+            chips++
+          }
+        }
+        str += pairs + ' ' + generators + ' ' + chips + "\n"
+      }
+
+      if (seen[str])
+        return
+      seen[str] = moves
+      var j = binarySearch(states, man + moves, 0, states.length - 1)
+
+      states.splice(j, 0, [state, elevator, moves, moves+man])
+    })
+  }
 }
 
 const part1Input = `The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
