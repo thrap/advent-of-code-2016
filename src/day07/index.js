@@ -1,36 +1,34 @@
 import run from "aocrunner"
 
-const re = /(.*)/
-const parseLine = l => l.match(re).slice(1).map(x => +x ? +x : x)
-const parseInput = rawInput => rawInput.split('\n')
+const split = str => {
+  var a = ''
+  var b = ''
+  str.split(/\[|\]/).forEach((x, i) => {
+    if (i % 2 == 0) {
+      a += ' ' + x
+    } else {
+      b += ',' + x
+    }
+  });
+
+  return [a, b]
+}
+const parseInput = rawInput => rawInput.split('\n').map(split)
 
 const part1 = (rawInput) => {
   const input = parseInput(rawInput)
 
   const re = /(.)(?!\1)(.)(\2)(\1)/
 
-  const split = str => {
-    var a = ''
-    var b = ''
-    str.split(/\[|\]/).forEach((x, i) => {
-      if (i % 2 == 0) {
-        a += ' ' + x
-      } else {
-        b += '|' + x
-      }
-    });
-
-    return [a, b]
-  }
-
-
-  return input.map(split).filter(([s1, brackets]) => re.test(s1) && !re.test(brackets)).length
+  return input.filter(([s1, brackets]) => re.test(s1) && !re.test(brackets)).length
 }
 
 const part2 = (rawInput) => {
   const input = parseInput(rawInput)
 
-  return
+  const re = /(.)(?!\1)(.)(\1).*\|.*(\2)(\1)(\2)/
+
+  return input.filter(([a, b]) => re.test(a+'|'+b)).length
 }
 
 run({
@@ -38,9 +36,6 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [
-    ],
     solution: part2,
   },
-  onlyTests: false
 })
