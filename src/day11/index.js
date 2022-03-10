@@ -56,7 +56,88 @@ const part1 = (rawInput) => {
   }
 
   var minMoves = Number.MAX_VALUE
+
+  const getPossible = (state, elevator, moves) => {
+    const queue = []
+    const floor = state[elevator]
+    for (var i = 0; i < floor.length; i++) {
+      if (floor[i]) {
+        for (var j = i + 1; j < floor.length; j++) {
+          if (floor[j]) {
+            if (elevator < 3)
+              queue.push([moveUp(state, elevator, i, j), elevator + 1, moves + 1])
+            if (elevator > 0)
+              queue.push([moveDown(state, elevator, i, j), elevator - 1, moves + 1])
+          }
+        }
+
+        if (elevator < 3)
+          queue.push([moveUp(state, elevator, i), elevator + 1, moves + 1])
+        if (elevator > 0)
+          queue.push([moveDown(state, elevator, i), elevator - 1, moves + 1])
+      }
+    }
+    return queue.filter(([state]) => isValid(state))
+  }
+
+  const printOrder = asd.flat().sort()
+
   const seen = {}
+
+  const manhattan = state => {
+    return manhattan2(state)
+    var sum = 0
+    for (var i = 1; i < 4; i++) {
+      sum += i * state[3-i].filter(x => x).length
+    }
+    return 2*sum
+  }
+
+  const manhattan2 = state => {
+    var sum = 0
+    for (var i = 1; i < 4; i++) {
+      const count = Math.ceil(state[3-i].filter(x => x).length / 2)
+      sum += i + 2 * i * (count - 1)
+    }
+    return sum
+  }
+
+  var state = Array(4).fill(0).map((_,i) => printOrder.map(x => asd[i].includes(x)))
+  prettyPrint(0, state, printOrder)
+  var states = [[state, elevator, 0, 0]]
+  const added = {}
+  for (var i = 0; i <= 500000 && states.length; i++) {
+    const [state, elevator, moves, man] = states.shift()
+    if (i % 1000 == 0) {
+      console.log(man, moves);
+      console.log(states.length);
+    }
+    if (state[3].every(x => x)) {
+      console.log("VUNNET");
+      console.log(moves);
+      minMoves = moves
+      console.log(states.length);
+      states = states.filter(([s, e, moves]) => moves < minMoves)
+      console.log(states.length);
+      console.log(i);
+      return moves
+      throw 1
+    }
+    const pos = getPossible(state, elevator, moves)
+    pos.forEach(([state, elevator, moves]) => {
+      if (moves > minMoves) return
+      var str = elevator + state.join('')
+      if (seen[str])
+        return
+      seen[str] = moves
+      states.push([state, elevator, moves, moves+manhattan(state)])
+    })
+    states.sort(([,,,a], [,,,b]) => a-b)
+    //console.log(states);
+    //console.log(state, elevator, moves);
+    //console.log(states.length);
+  }
+
   const recur = (state, elevator, moves) => {
     if (moves >= minMoves)
       return
@@ -65,7 +146,6 @@ const part1 = (rawInput) => {
       return
     seen[str] = moves
     //prettyPrint(elevator, state, printOrder)
-    if (!isValid(state)) return
     if (state[3].every(x => x)) {
       console.log("VUNNET");
       console.log(moves);
@@ -73,31 +153,10 @@ const part1 = (rawInput) => {
       return
     }
 
-    const floor = state[elevator]
-    for (var i = 0; i < floor.length; i++) {
-      if (floor[i]) {
-        for (var j = i + 1; j < floor.length; j++) {
-          if (floor[j]) {
-            if (elevator < 3)
-              recur(moveUp(state, elevator, i, j), elevator + 1, moves + 1)
-            if (elevator > 0)
-              recur(moveDown(state, elevator, i, j), elevator - 1, moves + 1)
-          }
-        }
-
-        if (elevator < 3)
-          recur(moveUp(state, elevator, i), elevator + 1, moves + 1)
-        if (elevator > 0)
-          recur(moveDown(state, elevator, i), elevator - 1, moves + 1)
-      }
-    }
-
+    getPossible(state, elevator, moves).forEach(([s, e, m]) => recur(s, e, m))
   }
 
-  const printOrder = asd.flat().sort()
-  var state = Array(4).fill(0).map((_,i) => printOrder.map(x => asd[i].includes(x)))
-
-  recur(state, elevator, 0)
+  //recur(state, elevator, 0)
 
   return minMoves
 }
@@ -126,5 +185,5 @@ run({
     ],
     solution: part2,
   },
-  onlyTests: true
+  onlyTests: false
 })
