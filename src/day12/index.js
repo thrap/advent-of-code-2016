@@ -2,54 +2,50 @@ import run from "aocrunner"
 
 const parseInput = rawInput => rawInput.replace(/,/g, '').split('\n')
 
-const execute = (register, program) => {
+const execute = (reg, program) => {
   var i = 0
-  var j = 0
   while (i < program.length) {
-    if (++j % 100000 == 0) {
-      console.log(register);
+    if (reg['b'] == 0 && reg['d'] > 1) {
+      if (i == 13) {
+        reg = { a: reg['a'] + reg['c'], b: 0, c : reg['a'], d: reg['d'] - 1 }
+        i--
+        continue
+      }
     }
     const [inst, x, y] = program[i].split(' ')
     if (inst == 'cpy') {
-      register[y] = /[a-z]/.test(x) ? register[x] : +x
+      reg[y] = /[a-z]/.test(x) ? reg[x] : +x
     } else if (inst == 'inc') {
-      register[x] = register[x] + 1
+      reg[x] = reg[x] + 1
     } else if (inst == 'dec') {
-      register[x] = register[x] - 1
+      reg[x] = reg[x] - 1
     } else if (inst == 'jnz') {
-      if (register[x] != 0) {
+      if (reg[x] != 0) {
         i += +y
         continue
       }
     }
     i++
   }
-  return register['a']
+  return reg['a']
 }
 
 const part1 = (rawInput) => {
   const program = parseInput(rawInput)
 
-  const register = { a: 0, b: 0, c: 0, d: 0 }
-  return execute(register, program)
+  const reg = { a: 0, b: 0, c: 0, d: 0 }
+  return execute(reg, program)
 }
 
 const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
+  const program = parseInput(rawInput)
 
-  return
+  const reg = { a: 0, b: 0, c: 1, d: 0 }
+  return execute(reg, program)
 }
 
 run({
   part1: {
-    tests: [
-{ input: `cpy 41 a
-inc a
-inc a
-dec a
-jnz a 2
-dec a`, expected: 42}
-    ],
     solution: part1,
   },
   part2: {
