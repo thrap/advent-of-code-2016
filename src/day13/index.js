@@ -1,6 +1,6 @@
 import run from "aocrunner"
 
-var SIZE = 100
+var SIZE = 50
 const createGrid = input => {
   const n = +input
   const grid = Array(SIZE).fill(0).map(_ => Array(SIZE))
@@ -12,45 +12,54 @@ const createGrid = input => {
   return grid
 }
 
+const dirs = [[1,0],[0,1],[-1,0],[0,-1]]
+
 const part1 = (rawInput) => {
   const grid = createGrid(rawInput)
-
-  const dirs = [[1,0],[0,1],[-1,0],[0,-1]]
 
   const goalX = 31
   const goalY = 39
 
   var minSteps = Number.MAX_VALUE
   const min = {}
-  const dfs = (x,y, steps, visited) => {
-    if (visited[[x,y]] || steps >= minSteps)
-      return
-    if (min[[x,y]] && min[[x,y]] < steps) {
-      return
-    }
+  const dfs = (x,y, steps) => {
+    if ((min[[x,y]] && min[[x,y]] < steps) || steps >= minSteps) return
+
     min[[x,y]] = steps
     if (x == goalX && y == goalY) {
       minSteps = Math.min(minSteps, steps)
       return
     }
-    const newVisit = { ...visited}
-    visited[[x,y]] = true
     dirs.forEach(([dx, dy]) => {
       if (grid[x + dx]?.[y+dy] === false) {
-        dfs(x+dx, y+dy, steps+1, newVisit)
+        dfs(x+dx, y+dy, steps+1)
       }
     })
   }
 
-  dfs(1,1, 0, {});
+  dfs(1,1, 0);
 
   return minSteps
 }
 
 const part2 = (rawInput) => {
-  const input = createGrid(rawInput)
+  const grid = createGrid(rawInput)
 
-  return
+  const min = {}
+  const dfs = (x,y, steps) => {
+    if ((min[[x,y]] && min[[x,y]] < steps) || steps > 50) return
+    min[[x,y]] = steps
+
+    dirs.forEach(([dx, dy]) => {
+      if (grid[x + dx]?.[y+dy] == false) {
+        dfs(x+dx, y+dy, steps+1)
+      }
+    })
+  }
+
+  dfs(1,1, 0);
+
+  return Object.keys(min).length
 }
 
 run({
