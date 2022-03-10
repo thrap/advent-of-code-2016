@@ -1,16 +1,14 @@
 import run from "aocrunner"
 
-const parseInput = rawInput => rawInput.split('\n')//.map(parseLine)
-
-const part1 = (rawInput) => {
-  const input = parseInput(rawInput)
+const screen = input => {
   const width = 50
   const height = 6
   const screen = Array(height).fill(0).map(_ => Array(width).fill(false))
 
   const rect = /^rect (\d+)x(\d+)$/
   const rotate = /^rotate .* (x|y)=(\d+) by (\d+)$/
-  input.forEach(op => {
+
+  input.split('\n').forEach(op => {
     if (rect.test(op)) {
       const [wide, tall] = op.match(rect).slice(1).map(x => +x)
       for (var i = 0; i < wide; i++) {
@@ -30,13 +28,14 @@ const part1 = (rawInput) => {
     }
   })
 
-  return screen.flat().filter(x => x).length
+  return screen
 }
+const part1 = (input) => screen(input).flat().filter(x => x).length
 
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
-
-  return
+const part2 = (input) => {
+  console.log(screen(input).map(l => l.map(x => x ? '█' : ' ').join('')).join('\n'))
+  // By output from console.log.
+  return "AFBUPZBJPS"
 }
 
 run({
