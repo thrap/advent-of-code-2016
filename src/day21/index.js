@@ -1,54 +1,42 @@
 import run from "aocrunner"
 
-const re = /(.*)/
-const parseLine = l => l.match(re).slice(1).map(x => +x ? +x : x)
-const parseInput = rawInput => rawInput.split('\n')//.map(parseLine)
+const parseInput = rawInput => rawInput.split('\n')
 
-const part1 = (rawInput) => {
-  const input = parseInput(rawInput)
-
-  var str = 'abcdefgh'
-
-  console.log(input)
-
-  const rotateLeft = (str, n) => {
-    for (var i = 0; i < n; i++) {
-      str = str.slice(1) + str[0]
-    }
-    return str
+const rotateLeft = (str, n) => {
+  for (var i = 0; i < n; i++) {
+    str = str.slice(1) + str[0]
   }
-  const rotateRight = (str, n) => {
-    for (var i = 0; i < n; i++) {
-      str = str[str.length-1] + str.slice(0, str.length-1)
-    }
-    return str
+  return str
+}
+const rotateRight = (str, n) => {
+  for (var i = 0; i < n; i++) {
+    str = str[str.length-1] + str.slice(0, str.length-1)
   }
+  return str
+}
 
-  const swap = (str, from, to) => {
-    const arr = str.split('')
-    var temp = arr[from]
-    arr[from] = arr[to]
-    arr[to] = temp
+const swap = (str, from, to) => {
+  const arr = str.split('')
+  var temp = arr[from]
+  arr[from] = arr[to]
+  arr[to] = temp
 
-    return arr.join('')
-  }
+  return arr.join('')
+}
 
-  const reverse = (str, from, to) => {
-    const temp = str.slice(from, to+1)
-    return str.replace(temp, temp.split('').reverse().join(''))
-  }
+const reverse = (str, from, to) => {
+  const temp = str.slice(from, to+1)
+  return str.replace(temp, temp.split('').reverse().join(''))
+}
 
-  const move = (str, from, to) => {
-    const arr = str.split('')
-    console.log(from, to);
-    console.log(arr);
-    console.log(str[from]);
-    arr.splice(from, 1)
-    arr.splice(to, 0, str[from])
-    console.log(arr)
-    return arr.join('')
-  }
+const move = (str, from, to) => {
+  const arr = str.split('')
+  arr.splice(from, 1)
+  arr.splice(to, 0, str[from])
+  return arr.join('')
+}
 
+const scramble = (instructions, str) => {
   const rotateR = /rotate right (\d) steps?/
   const rotateL = /rotate left (\d) steps?/
   const rotateB = /rotate based on position of letter (.+)/
@@ -56,9 +44,8 @@ const part1 = (rawInput) => {
   const swapC = /swap letter (.+) with letter (.+)/
   const reverseP = /reverse positions (\d+) through (\d+)/
   const moveP = /move position (\d+) to position (\d+)/
-  return input.reduce((acc, op) => {
-    console.log(acc);
-    console.log(op);
+
+  return instructions.reduce((acc, op) => {
     if (rotateR.test(op)) {
       return rotateRight(acc, +op.match(rotateR)[1])
     } else if (rotateL.test(op)){
@@ -85,37 +72,43 @@ const part1 = (rawInput) => {
       throw 1
     }
   }, str)
+}
 
-  return
+const part1 = (rawInput) => {
+  const instructions = parseInput(rawInput)
+
+  var str = 'abcdefgh'
+
+  return scramble(instructions, str)
 }
 
 const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
+  const instructions = parseInput(rawInput)
 
-  return
+  var found
+  const permutations = (arr, acc) => {
+    if (found) return
+    if (arr.length == 0 || found) {
+      if (scramble(instructions, acc) == 'fbgdceah') {
+        found = acc
+      }
+    }
+
+    arr.forEach(c => {
+      var newSet = [...arr].filter(x => x != c)
+      permutations(newSet, acc + c)
+    })
+  }
+
+  permutations('abcdefgh'.split(''), '')
+  return found
 }
 
-const part1Input = `swap position 4 with position 0
-swap letter d with letter b
-reverse positions 0 through 4
-rotate left 1 step
-move position 1 to position 4
-move position 3 to position 0
-rotate based on position of letter b
-rotate based on position of letter d`
-const part2Input = part1Input
 run({
   part1: {
-    tests: [
-      { input: part1Input, expected: '' },
-    ],
     solution: part1,
   },
   part2: {
-    tests: [
-      { input: part2Input, expected: '' },
-    ],
     solution: part2,
   },
-  onlyTests: false,
 })
