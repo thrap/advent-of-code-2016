@@ -1,41 +1,37 @@
 import run from "aocrunner"
 
-const re = /(.*)/
-const parseLine = l => l.match(re).slice(1).map(x => +x ? +x : x)
 const parseInput = rawInput => rawInput.split('').map(c => c == '^')
 
-const part1 = (rawInput) => {
-  var board = [parseInput(rawInput)]
-  for (var j = 1; j < 40; j++) {
-    var row = []
-    const traps = board[j-1]
-    for(var i = 0; i < traps.length; i++) {
-      const left = traps[i-1]
-      const center = traps[i]
-      const right = traps[i+1]
-      if (left && center && !right) {
-        row.push(true)
-      } else if (!left && center && right) {
-        row.push(true)
-      } else if (left && !center && !right) {
-        row.push(true)
-      } else if (!left && !center && right) {
-        row.push(true)
-      } else {
-        row.push(false)
-      }
+const nextRow = (traps, count) => {
+  var row = []
+  for(var i = 0; i < traps.length; i++) {
+    const l = traps[i-1]
+    const c = traps[i]
+    const r = traps[i+1]
+    if ((l && c && !r) || (!l && c && r) || (l && !c && !r) || (!l && !c && r)) {
+      row.push(true)
+    } else {
+      count ++
+      row.push(false)
     }
-    board.push(row)
+  }
+  return [row, count]
+}
+
+const count = (rows, input) => {
+  var traps = parseInput(input)
+  var count = traps.filter(x => !x).length
+
+  for (var j = 1; j < rows; j++) {
+    [traps, count] = nextRow(traps, count)
   }
 
-  return board.flat().filter(x => !x).length
+  return count
 }
 
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
+const part1 = (input) => count(40, input)
 
-  return
-}
+const part2 = (input) => count(400000, input)
 
 run({
   part1: {
