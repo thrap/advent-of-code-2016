@@ -1,8 +1,6 @@
 import run from "aocrunner"
 
-const re = /(.*)/
-const parseLine = l => l.match(re).slice(1).map(x => +x ? +x : x)
-const parseInput = rawInput => rawInput.replace(/,/g, '').split('\n')
+const parse = input => input.replace(/,/g, '').split('\n')
 
 const tgl = line => {
   const split = line.split(' ')
@@ -28,13 +26,14 @@ const tgl = line => {
 }
 
 const execute = (reg, program) => {
-  var j = 0
   var i = 0
   while (i < program.length) {
-    if (++j % 1000000 == 0) {
-
-      console.log(j, reg)
-      return
+    if (reg['d'] == 0 && reg['c'] == 0 && i == 9) {
+      var ans = reg['a']
+      for (var counter = reg['b'] - 1; counter > 1; counter--) {
+        ans *= counter
+      }
+      return ans + 7290
     }
     const [inst, x, y] = program[i].split(' ')
     const xval = /[a-z]/.test(x) ? reg[x] : +x
@@ -54,16 +53,12 @@ const execute = (reg, program) => {
         continue
       }
     } else if (inst == 'tgl') {
-      console.log(program[i]);
-      console.log(i+xval);
       if (i+xval >= program.length-1 || i+xval < 0) {
         i++
         continue
       }
       program[i+xval] = tgl(program[i+xval])
     } else {
-      console.log(inst);
-      console.log(program[i]);
       throw 1
     }
     i++
@@ -71,39 +66,15 @@ const execute = (reg, program) => {
   return reg['a']
 }
 
-const part1 = (rawInput) => {
-  const program = parseInput(rawInput)
+const part1 = (input) => execute({ a: 7, b: 0, c: 0, d: 0 }, parse(input))
 
-  const reg = { a: 7, b: 0, c: 0, d: 0 }
-  return execute(reg, program)
-}
+const part2 = (input) => execute({ a: 12, b: 0, c: 0, d: 0 }, parse(input))
 
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput)
-
-  return
-}
-
-const part1Input = `cpy 2 a
-tgl a
-tgl a
-tgl a
-cpy 1 a
-dec a
-dec a`
-const part2Input = part1Input
 run({
   part1: {
-    tests: [
-      { input: part1Input, expected: 3 },
-    ],
     solution: part1,
   },
   part2: {
-    tests: [
-      { input: part2Input, expected: '' },
-    ],
     solution: part2,
   },
-  onlyTests: false,
 })
