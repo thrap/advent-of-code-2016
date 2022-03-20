@@ -98,6 +98,63 @@ const part1 = (rawInput) => {
 }
 
 const part2 = (rawInput) => {
+  const grid = parseInput(rawInput)
+
+  var coords = {}
+  for (var x = 0; x < grid.length; x++) {
+    for (var y = 0; y < grid[0].length; y++) {
+      if (/\d/.test(grid[x][y]))
+        coords[grid[x][y]] = [x, y]
+    }
+  }
+  var nodes = Object.keys(coords).sort()
+
+  console.log(coords);
+  console.log(nodes);
+  const distance = {}
+  nodes.forEach(start => {
+    distance[start] = {}
+    nodes.forEach(goal => {
+      distance[start][goal] = aStar(grid, start, goal)
+    })
+  })
+
+  const pathLength = str => {
+    var sum = 0
+    for (var i = 0; i < str.length-1; i++) {
+      sum += distance[str[i]][str[i+1]]
+    }
+    return sum
+  }
+
+  var min = Number.MAX_VALUE
+  const permutations = (arr, acc) => {
+    if (arr.length == 0) {
+      var length = pathLength(acc+"0")
+      if (length < min) {
+        min = length
+        console.log(min);
+      }
+    }
+
+    arr.forEach(c => {
+      var newSet = [...arr].filter(x => x != c)
+      permutations(newSet, acc + c)
+    })
+  }
+
+  permutations(nodes.slice(1), '0')
+
+  console.log(distance);
+
+  console.log(aStar(grid, 0, 4));
+  console.log(aStar(grid, 4, 1));
+  console.log(aStar(grid, 1, 2));
+  console.log(aStar(grid, 2, 3));
+
+  console.log(grid.length * grid[0].length);
+
+  return min
   const input = parseInput(rawInput)
 
   return
